@@ -134,6 +134,9 @@ function showDay(date) {
     link(`https://www.nba.com/games?date=${previousDate}`, 'NBA 官方赛程 · 北美前一日'),
     link(`https://www.nba.com/games?date=${date}`, 'NBA 官方赛程 · 北美同日')
   );
+  if (dayGames.some(game => game.type === 'NBA 杯小组赛')) {
+    source.append(link('https://www.nba.com/news/emirates-nba-cup-key-dates-schedule', 'NBA 杯官方赛程'));
+  }
   main.append(source);
 }
 
