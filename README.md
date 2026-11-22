@@ -1,1 +1,9 @@
 # NBA-daily
+
+《终场哨》整理 NBA 完赛战报与球队官宣，逐条附出处。
+
+[打开终场哨首页](https://hyzlarry.github.io/NBA-daily/)
+
+## 历史归档
+
+- [2026 年 11 月 22 日 NBA 简报](https://hyzlarry.github.io/NBA-daily/archive/2026-11-22/)
