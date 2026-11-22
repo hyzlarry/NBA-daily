@@ -26,6 +26,14 @@ nav a,.links a{font-size:.875rem;display:inline-flex;align-items:center;min-heig
 .mast p,.issue{margin:0}
 .issue{border-left:1px solid var(--line);padding-left:1.1rem;font-size:.875rem;white-space:nowrap}
 .issue time{display:block;font-size:1.2rem;font-weight:700;color:var(--ink)}
+.season-archive{margin:0 0 1.4rem;padding:1rem 1.15rem;border:1px solid var(--line);background:var(--panel);scroll-margin-top:1rem}
+.season-heading{display:flex;align-items:baseline;flex-wrap:wrap;gap:.25rem 1rem}
+.season-heading h2{margin:0;font-size:clamp(1.25rem,3vw,1.65rem)}
+.season-heading a{color:var(--accent);font-size:.875rem}
+.season-archive nav{gap:.1rem .9rem;margin:.25rem 0 .5rem}
+.season-date{display:flex;align-items:center;flex-wrap:wrap;gap:.5rem}
+.season-date label{font-size:.875rem;color:var(--muted)}
+.season-date input{min-height:2.65rem;border:1px solid #647c9f;background:var(--paper);color:var(--ink);padding:.3rem .55rem;font:inherit;font-size:.875rem}
 .lead{background:var(--panel);color:var(--ink);position:relative;overflow:hidden;display:grid;grid-template-columns:1.55fr 1fr}
 .lead-copy{position:relative;z-index:1;padding:clamp(1.4rem,4.8vw,3.2rem)}
 .meta{display:flex;gap:.3rem .75rem;flex-wrap:wrap;font-size:.875rem}
@@ -77,12 +85,34 @@ footer{border-top:1px solid var(--line);padding:.85rem 0;font-size:.875rem}
 </style>
 </head>
 <body id="top">
-<header><div class="wrap top"><a href="#top" class="brand">终场哨</a><nav aria-label="站内导航"><a href="#feed">快讯</a><a href="#archive">历史归档</a><a href="#sources">信息源</a></nav></div></header>
+<header><div class="wrap top"><a href="#top" class="brand">终场哨</a><nav aria-label="站内导航"><a href="#season">赛季归档</a><a href="#feed">快讯</a><a href="#archive">历史归档</a><a href="#sources">信息源</a></nav></div></header>
 <main class="wrap">
   <div class="mast">
     <div><div class="kicker" lang="en">NBA NEWS BRIEF</div><h1>NBA 资讯简报</h1><p>完赛比分、关键回合与球队官宣。</p></div>
     <p class="issue">本期 · 北京时间 <time datetime="2026-11-22">2026.11.22</time></p>
   </div>
+  <section class="season-archive" id="season" aria-labelledby="season-title">
+    <div class="season-heading">
+      <h2 id="season-title">2026–27 赛季逐日归档</h2>
+      <a href="./archive/daily/index.html">查看完整赛季日历</a>
+    </div>
+    <nav aria-label="按月查看赛季归档">
+      <a href="./archive/daily/index.html#2026-10">2026 年 10 月</a>
+      <a href="./archive/daily/index.html#2026-11">11 月</a>
+      <a href="./archive/daily/index.html#2026-12">12 月</a>
+      <a href="./archive/daily/index.html#2027-01">2027 年 1 月</a>
+      <a href="./archive/daily/index.html#2027-02">2 月</a>
+      <a href="./archive/daily/index.html#2027-03">3 月</a>
+      <a href="./archive/daily/index.html#2027-04">4 月</a>
+      <a href="./archive/daily/index.html#2027-05">5 月</a>
+      <a href="./archive/daily/index.html#2027-06">6 月</a>
+    </nav>
+    <form class="season-date" action="./archive/daily/index.html">
+      <label for="season-date">按北京时间查找</label>
+      <input id="season-date" name="date" type="date" min="2026-10-01" max="2027-06-30" value="2026-11-22" required>
+      <button type="submit">打开当日归档</button>
+    </form>
+  </section>
   <article class="lead" aria-labelledby="lead-title">
     <div class="lead-copy">
       <div class="meta"><time datetime="2026-11-22">11 月 22 日</time><span>常规赛 · 已完赛</span></div>
@@ -148,7 +178,7 @@ footer{border-top:1px solid var(--line);padding:.85rem 0;font-size:.875rem}
   <section class="archive" id="archive" aria-labelledby="archive-title">
     <h2 id="archive-title">历史归档</h2>
     <div class="links">
-      <a href="./archive/daily/index.html">2026 年 10–11 月逐日归档</a>
+      <a href="./archive/daily/index.html">2026–27 赛季逐日归档</a>
       <a href="./archive/2026-11/index.html">2026 年 11 月 NBA 月报</a>
       <a href="./archive/2026-10/index.html">2026 年 10 月 NBA 月报</a>
       <a href="./archive/2026-11-22/index.html">2026 年 11 月 22 日 NBA 简报</a>

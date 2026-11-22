@@ -23,12 +23,14 @@ h2 { font-size: clamp(1.35rem, 4vw, 1.9rem); margin: 0 0 .65rem; }
 p { margin: .4rem 0; }
 .sub, .meta, footer { color: var(--muted); }
 .calendars { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.2rem; margin-top: 1.5rem; }
-.month { background: var(--panel); padding: clamp(.7rem, 3vw, 1.25rem); border: 1px solid var(--line); }
+.month-jump { margin-top: .55rem; }
+.month { background: var(--panel); padding: clamp(.7rem, 3vw, 1.25rem); border: 1px solid var(--line); scroll-margin-top: 1rem; }
 .month nav { margin-bottom: .5rem; }
 .calendar { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .25rem; }
 .weekday { color: var(--muted); text-align: center; font-size: .8rem; }
 .day { display: grid; place-content: center; text-align: center; min-height: 3.65rem; border: 1px solid var(--line); text-decoration: none; font-weight: 650; }
 .day:hover { border-color: var(--accent); background: var(--paper); }
+.day[aria-current="date"] { border-color: var(--accent); }
 .day small { color: var(--muted); font-size: .68rem; line-height: 1.15; font-weight: 500; }
 .month p { margin-top: .7rem; }
 .day-nav { justify-content: space-between; margin: .8rem 0 1rem; }
