@@ -6,7 +6,7 @@
 <meta name="description" content="面向手机阅读的 NBA 比赛战报和官方交易、签约资讯。">
 <title>终场哨｜NBA 资讯简报</title>
 <style>
-:root{color-scheme:light;--ink:#151515;--paper:#f6f6f4;--muted:#555;--line:#d0d0cc;--mono:Consolas,"SFMono-Regular",monospace}
+:root{color-scheme:dark;--ink:#f2f6ff;--paper:#080f20;--muted:#a8b8d3;--line:#33496a;--panel:#101e36;--accent:#aacaff;--mono:Consolas,"SFMono-Regular",monospace}
 *{box-sizing:border-box}
 body{margin:0;background:var(--paper);color:var(--ink);font:1rem/1.65 "PingFang SC","Microsoft YaHei",system-ui,sans-serif}
 a{color:inherit;text-underline-offset:.24em}
@@ -26,16 +26,16 @@ nav a,.links a{font-size:.875rem;display:inline-flex;align-items:center;min-heig
 .mast p,.issue{margin:0}
 .issue{border-left:1px solid var(--line);padding-left:1.1rem;font-size:.875rem;white-space:nowrap}
 .issue time{display:block;font-size:1.2rem;font-weight:700;color:var(--ink)}
-.lead{background:#121212;color:#fff;position:relative;overflow:hidden;display:grid;grid-template-columns:1.55fr 1fr}
+.lead{background:var(--panel);color:var(--ink);position:relative;overflow:hidden;display:grid;grid-template-columns:1.55fr 1fr}
 .lead-copy{position:relative;z-index:1;padding:clamp(1.4rem,4.8vw,3.2rem)}
 .meta{display:flex;gap:.3rem .75rem;flex-wrap:wrap;font-size:.875rem}
 .meta time{font-family:var(--mono)}
-.lead .meta,.lead-copy p{color:#d7d7d7}
+.lead .meta,.lead-copy p{color:#c5d0e3}
 .lead h2{font-size:clamp(1.95rem,4.3vw,3.7rem);letter-spacing:-.065em;line-height:1.15;margin:.7rem 0}
 .lead-copy p{margin:.6rem 0}
 .board{display:flex;align-items:center;gap:.75rem 1rem;flex-wrap:wrap;font-weight:700;font-size:clamp(1rem,2.4vw,1.45rem)}
 .score{font-size:clamp(2.2rem,5.7vw,4.2rem);letter-spacing:-.07em;line-height:1.12}
-.court{position:relative;display:grid;place-items:center;height:100%;min-height:11rem;background:radial-gradient(ellipse,#323232,#121212 73%)}
+.court{position:relative;display:grid;place-items:center;height:100%;min-height:11rem;background:radial-gradient(ellipse,#264775,var(--panel) 73%)}
 .court::before{content:"";position:absolute;inset:10% 7%;border:1px solid #ffffff47;border-radius:.3rem;background:linear-gradient(90deg,transparent calc(50% - .5px),#ffffff4d calc(50% - .5px),#ffffff4d calc(50% + .5px),transparent calc(50% + .5px))}
 .court::after{content:"";width:62%;aspect-ratio:1;border-radius:50%;border:1px solid #ffffff75;box-shadow:0 0 0 14px #ffffff08,inset 0 0 0 13px #ffffff0b,0 0 32px #ffffff14;background:repeating-linear-gradient(-34deg,transparent 0 13px,#ffffff1c 14px 15px)}
 .feed,.archive,.channels{margin-top:2.45rem;scroll-margin-top:1rem}
@@ -43,17 +43,17 @@ nav a,.links a{font-size:.875rem;display:inline-flex;align-items:center;min-heig
 .section-head h2,.archive h2,.channels h2{margin:0;font-size:clamp(1.5rem,3vw,2.2rem);line-height:1.25;letter-spacing:-.04em}
 .section-head p{margin:0;color:var(--muted);font-size:.875rem}
 .filters{display:flex;flex-wrap:wrap;gap:.5rem;margin:1rem 0}
-button{background:transparent;border:1px solid #888;font:inherit;font-size:.875rem;padding:.3rem .8rem;min-height:2.65rem;cursor:pointer;color:inherit}
-button[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+button{background:transparent;border:1px solid #647c9f;font:inherit;font-size:.875rem;padding:.3rem .8rem;min-height:2.65rem;cursor:pointer;color:inherit}
+button[aria-pressed=true]{background:var(--accent);color:var(--paper);border-color:var(--accent)}
 .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line)}
 .story{min-width:0;border-bottom:1px solid var(--line);padding:1.05rem 1.2rem 1rem 0;display:flex;flex-direction:column}
 .story:nth-child(even of :not([hidden])){padding-inline:1.2rem 0;border-left:1px solid var(--line)}
 .story h3{margin:.35rem 0 .45rem;font-size:clamp(1.2rem,2.35vw,1.6rem);line-height:1.35}
-.story p{margin:.15rem 0 .45rem;color:#414141}
+.story p{margin:.15rem 0 .45rem;color:#c5d0e3}
 .story .result{font-size:.9rem;color:var(--ink)}
 .result strong{font-family:var(--mono);padding-inline:.22rem}
 .story .links{margin-top:auto}
-.links .video-link{font-weight:700}
+.links .video-link{color:var(--accent);font-weight:700}
 .video-link::before{content:"";border-top:.33em solid transparent;border-bottom:.33em solid transparent;border-left:.47em solid currentColor;margin-right:.42em}
 .archive,.channels{border-top:2px solid;padding-top:1.15rem}
 .archive .links{margin-top:.45rem}
