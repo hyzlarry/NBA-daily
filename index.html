@@ -111,8 +111,17 @@ footer{border-top:1px solid var(--line);padding:.85rem 0;font-size:.875rem}
       <label for="season-date">按北京时间查找</label>
       <input id="season-date" name="date" type="date" min="2026-10-01" max="2027-06-30" value="2026-11-22" required>
       <button type="submit">打开当日归档</button>
+      <a id="latest-scores" href="./archive/daily/index.html?date=2026-11-22">查看最新赛况</a>
     </form>
   </section>
+  <script src="./archive/daily/data.js?v=2"></script>
+  <script>
+    if (typeof nbaArchiveData !== 'undefined') {
+      const { cutoff } = nbaArchiveData;
+      document.querySelector('#season-date').value = cutoff;
+      document.querySelector('#latest-scores').href = './archive/daily/index.html?date=' + cutoff;
+    }
+  </script>
   <article class="lead" aria-labelledby="lead-title">
     <div class="lead-copy">
       <div class="meta"><time datetime="2026-11-22">11 月 22 日</time><span>常规赛 · 已完赛</span></div>

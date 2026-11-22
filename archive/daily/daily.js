@@ -1,4 +1,5 @@
 const { cutoff, games: archivedGames, moves, highlights } = nbaArchiveData;
+const archivedIds = new Set(Object.values(archivedGames).flatMap(games => games.map(game => game.id)));
 const firstDate = '2026-10-01';
 const lastDate = '2027-06-30';
 const dayLength = 86400000;
@@ -50,7 +51,7 @@ function monthLabel(month) {
 
 function dayGames(date) {
   const fixtures = nbaSeasonFixtures[date] ?? [];
-  return archivedGames[date] ?? fixtures.map(([id, time, away, home, type = '常规赛']) => ({
+  return archivedGames[date] ?? fixtures.filter(([id]) => !archivedIds.has(id)).map(([id, time, away, home, type = '常规赛']) => ({
     id, time, away, home, type, status: '未开赛'
   }));
 }
@@ -87,10 +88,11 @@ function monthCalendar(month) {
     calendar.append(spacer);
   }
   for (const date of dates.filter(value => value.startsWith(month))) {
-    const scheduled = date > cutoff;
-    const count = dayGames(date).length;
+    const fixtures = dayGames(date);
+    const count = fixtures.length;
+    const completed = fixtures.filter(game => game.status === '完赛').length;
     let caption = '无比赛';
-    if (count) caption = scheduled ? `${count} 场待赛` : `${count} 场`;
+    if (count) caption = completed === count ? `${count} 场` : completed ? `${completed}/${count} 完赛` : `${count} 场赛程`;
     else if (events[date]) caption = '全明星';
     else if (pendingStage(date)) caption = '待公布';
     const node = link(dateUrl(date), String(Number(date.slice(-2))), 'day');
@@ -144,8 +146,8 @@ function gameCard(game) {
 function showDay(date) {
   document.title = `${dateLabel(date)} NBA 资讯｜终场哨`;
   const index = dates.indexOf(date);
-  const scheduled = date > cutoff;
   const fixtures = dayGames(date);
+  const scheduled = fixtures.length > 0 && fixtures.every(game => game.status === '未开赛');
   const dayMoves = moves[date] ?? [];
   const dayEvents = events[date] ?? [];
   const stage = pendingStage(date);
@@ -170,7 +172,7 @@ function showDay(date) {
   } else if (stage) {
     scores.append(el('p', stage[0]), link(stage[1], '查看 NBA 官方公告'));
   } else {
-    scores.append(el('p', scheduled ? '已公布的常规赛赛程当天无比赛。' : 'NBA 官方赛程显示当天没有比赛。'));
+    scores.append(el('p', date > cutoff ? '已公布的常规赛赛程当天无比赛。' : 'NBA 官方赛程显示当天没有比赛。'));
   }
   main.append(scores);
 
@@ -201,7 +203,7 @@ function showDay(date) {
     link(`https://www.nba.com/games?date=${previousDate}`, 'NBA 官方赛程 · 北美前一日'),
     link(`https://www.nba.com/games?date=${date}`, 'NBA 官方赛程 · 北美同日')
   );
-  if (scheduled) source.append(link(seasonScheduleUrl, 'NBA 官方赛季赛程'));
+  if (date > cutoff || scheduled) source.append(link(seasonScheduleUrl, 'NBA 官方赛季赛程'));
   if (fixtures.some(game => game.type === 'NBA 杯小组赛')) {
     source.append(link(cupUrl, 'NBA 杯官方赛程'));
   }
