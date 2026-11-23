@@ -1,0 +1,75 @@
+name: 更新终场哨
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        type: boolean
+        description: 只验证 NBA 来源与归档逻辑
+        default: false
+  schedule:
+    - cron: '15 4,8 * * *'
+
+concurrency:
+  group: nba-daily-pages
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pages: read
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        if: github.event_name != 'push'
+        with:
+          node-version: '24'
+      - name: Validate official schedule without writing
+        if: inputs.dry_run == true
+        run: node scripts/update-nba.mjs --dry-run
+      - name: Refresh official scores and schedule
+        if: github.event_name != 'push' && inputs.dry_run != true
+        run: node scripts/update-nba.mjs
+      - name: Configure Pages
+        if: inputs.dry_run != true
+        uses: actions/configure-pages@v5
+      - name: Save verified archive changes
+        if: github.event_name != 'push' && inputs.dry_run != true
+        run: |
+          if git diff --quiet -- archive/daily/data.js; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add archive/daily/data.js
+          git commit -m "Refresh NBA scores and schedule"
+          git push origin HEAD:main
+      - name: Stage public site
+        if: inputs.dry_run != true
+        run: |
+          mkdir _site
+          cp -r index.html archive _site/
+          data_version=$(sha256sum archive/daily/data.js | cut -c1-12)
+          sed -i "s/data\.js?v=[^\"]*/data.js?v=$data_version/" _site/index.html _site/archive/daily/index.html
+      - name: Upload site
+        if: inputs.dry_run != true
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+  deploy:
+    if: inputs.dry_run != true
+    needs: update
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
