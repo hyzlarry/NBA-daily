@@ -20,6 +20,7 @@ for (const story of collected) {
 }
 const firstDay = Date.parse('2026-10-01');
 const lastDay = Date.parse('2027-06-30');
+const firstNewsRequiredDate = '2026-11-23';
 
 function margin(game) {
   return Math.abs(game.as - game.hs);
@@ -64,6 +65,8 @@ function makeBrief(date) {
   newsItems.sort((a, b) => b.time.localeCompare(a.time));
   const teamNews = (moves[date] ?? []).slice(0, 8 - newsItems.length).map(([title, detail, url]) => ({ title, detail, url, label: '球队官宣' }));
   const headlineItems = [...newsItems, ...teamNews];
+  const newsCount = headlineItems.length;
+  const awaitingNews = date >= firstNewsRequiredDate && date <= cutoff && newsCount === 0;
   const totals = [];
   if (newsItems.length) totals.push(newsItems.length + ' 条 NBA 资讯');
   if (results.length) totals.push(results.length + ' 场完赛');
@@ -76,14 +79,14 @@ function makeBrief(date) {
       id: game.id, time: game.time, label: game.type + ' · 待赛',
       title: game.away + ' 对 ' + game.home, detail: ''
     }));
-    return { summary, entries: [...headlineItems, ...entries] };
+    return { summary, newsCount, awaitingNews, entries: [...headlineItems, ...entries] };
   }
   const remaining = results.filter(game => !covered.has(game.id));
   const standout = [...remaining].sort((a, b) => (highScorer(b)?.[1] ?? 0) - (highScorer(a)?.[1] ?? 0))[0];
   const tightest = [...remaining].sort((a, b) => margin(a) - margin(b))[0];
   const selection = [...new Set([tightest, standout, ...remaining].filter(Boolean))].slice(0, 8 - headlineItems.length);
   const entries = selection.sort((a, b) => a.time.localeCompare(b.time)).map(recap);
-  return { summary, entries: [...headlineItems, ...entries] };
+  return { summary, newsCount, awaitingNews, entries: [...headlineItems, ...entries] };
 }
 
 const published = new Date().toISOString();
@@ -92,7 +95,8 @@ for (let tick = firstDay; tick <= lastDay; tick += dayMs) {
   const date = new Date(tick).toISOString().slice(0, 10);
   days[date] = makeBrief(date);
 }
-const data = { published, cutoff, days };
+const latestEdition = Object.keys(days).findLast(date => date <= cutoff && days[date].newsCount > 0);
+const data = { published, cutoff, latestEdition, days };
 await writeFile(new URL('briefings.js', archive), 'const nbaDailyBriefings = ' + JSON.stringify(data) + ';\n');
 console.log('Generated ' + Object.keys(days).length + ' daily briefings, with verified results through ' + cutoff + '.');
 
@@ -101,14 +105,14 @@ function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, character => entities[character]);
 }
 
-function renderStory(story) {
+function renderStory(story, date) {
   const type = story.id ? 'game' : 'news';
   const matchLink = story.id ? 'https://www.nba.com/game/' + story.id : story.url;
   const sourceLabel = story.id ? 'NBA 比赛中心' : (story.source ?? '球队官方公告');
   const official = '<a href="' + escapeHtml(matchLink) + '">' + escapeHtml(sourceLabel) + '</a>';
   const video = highlights[story.videoId ?? story.id];
   const videoLink = video ? '<a class="video-link" href="' + escapeHtml(video) + '">腾讯体育全场集锦</a>' : '';
-  const time = story.time ? '<time datetime="' + cutoff + 'T' + escapeHtml(story.time) + ':00+08:00">' + escapeHtml(story.time) + '</time>' : '';
+  const time = story.time ? '<time datetime="' + date + 'T' + escapeHtml(story.time) + ':00+08:00">' + escapeHtml(story.time) + '</time>' : '';
   const detail = story.detail ? '<p>' + escapeHtml(story.detail) + '</p>' : '';
   return [
     '      <article class="story" data-kind="' + type + '">',
@@ -120,14 +124,14 @@ function renderStory(story) {
   ].join('\n');
 }
 
-function renderLatestBrief(brief) {
+function renderLatestBrief(brief, date) {
   const summary = brief.summary || 'NBA 官方赛程显示当天没有比赛。';
-  const dayUrl = './archive/daily/index.html?date=' + cutoff + '#daily-brief';
+  const dayUrl = './archive/daily/index.html?date=' + date + '#daily-brief';
   const lines = [
     '  <section id="latest-brief" aria-labelledby="brief-title">',
     '    <div class="mast">',
     '      <h1 id="brief-title">NBA 每日简报</h1>',
-    '      <p class="issue">本期 · 北京时间 <time datetime="' + cutoff + '">' + cutoff.replaceAll('-', '.') + '</time></p>',
+    '      <p class="issue">本期 · 北京时间 <time datetime="' + date + '">' + date.replaceAll('-', '.') + '</time></p>',
     '    </div>',
     '    <div class="overview"><p>' + escapeHtml(summary) + '</p><a href="' + dayUrl + '">查看当日完整归档</a></div>'
   ];
@@ -138,18 +142,19 @@ function renderLatestBrief(brief) {
       '      <button type="button" data-filter="news" aria-pressed="false">NBA 资讯</button>',
       '    </div>');
   }
-  if (brief.entries.length) lines.push('    <div class="grid">', ...brief.entries.map(renderStory), '    </div>');
+  if (brief.entries.length) lines.push('    <div class="grid">', ...brief.entries.map(story => renderStory(story, date)), '    </div>');
   lines.push('  </section>');
   return lines.join('\n');
 }
 
 const template = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const briefSection = /<!-- latest-brief:start -->[\s\S]*?<!-- latest-brief:end -->/;
-if (!briefSection.test(template) || !days[cutoff]) throw new Error('Missing homepage template or current briefing.');
+if (!briefSection.test(template) || !latestEdition) throw new Error('Missing homepage template or current briefing.');
 const homepage = template
-  .replace(briefSection, () => renderLatestBrief(days[cutoff]))
-  .replace('name="date" type="date"', 'name="date" type="date" value="' + cutoff + '"');
+  .replace(briefSection, () => renderLatestBrief(days[latestEdition], latestEdition))
+  .replace('name="date" type="date"', 'name="date" type="date" value="' + latestEdition + '"');
 const output = new URL('../_site/', import.meta.url);
 await mkdir(output, { recursive: true });
 await writeFile(new URL('index.html', output), homepage);
-console.log('Rendered latest briefing on homepage for ' + cutoff + '.');
+console.log('Rendered latest briefing on homepage for ' + latestEdition + '.');
+if (latestEdition !== cutoff) console.log('Briefing for ' + cutoff + ' is awaiting verified NBA news.');

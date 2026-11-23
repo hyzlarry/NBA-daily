@@ -152,6 +152,11 @@ function renderDailyBrief(date, fixtures, dayEvents, stage) {
   section.append(title);
 
   const brief = nbaDailyBriefings.days[date];
+  if (brief.awaitingNews) {
+    section.append(el('p', '当日 NBA 资讯正在等待核验。你可以先查看下方赛果与赛程。', 'briefing-summary'));
+    section.append(link('#day-sources', '查看当日来源', 'briefing-more'));
+    return section;
+  }
   let summary = brief.summary;
   if (!summary && dayEvents.length) summary = '本日有 NBA 全明星周末活动，开场时间见下方赛程。';
   if (!summary && stage) summary = stage[0];
