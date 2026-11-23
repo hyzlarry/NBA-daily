@@ -53,12 +53,11 @@ jobs:
       - name: Stage public site
         if: inputs.dry_run != true
         run: |
-          mkdir _site
-          cp -r index.html archive _site/
+          cp -r archive _site/
           brief_version=$(sha256sum archive/daily/briefings.js | cut -c1-12)
           sed -i "s/briefings\.js?v=[^\"]*/briefings.js?v=$brief_version/" _site/archive/daily/index.html
           data_version=$(sha256sum archive/daily/data.js | cut -c1-12)
-          sed -i "s/data\.js?v=[^\"]*/data.js?v=$data_version/" _site/index.html _site/archive/daily/index.html
+          sed -i "s/data\.js?v=[^\"]*/data.js?v=$data_version/" _site/archive/daily/index.html
       - name: Upload site
         if: inputs.dry_run != true
         uses: actions/upload-pages-artifact@v4
