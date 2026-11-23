@@ -167,12 +167,12 @@ function renderDailyBrief(date, fixtures, dayEvents, stage) {
       entry.append(el('p', meta, 'meta'), el('h3', story.title));
       if (story.detail) entry.append(el('p', story.detail));
       const links = el('div', '', 'links');
-      if (story.url) links.append(link(story.url, '球队官方公告'));
+      if (story.url) links.append(link(story.url, story.source ?? '球队官方公告'));
       if (story.id) {
         links.append(link('https://www.nba.com/game/' + story.id, 'NBA 比赛中心'));
-        const video = highlights[story.id];
-        if (video) links.append(link(video, '腾讯体育全场集锦', 'video'));
       }
+      const video = highlights[story.videoId ?? story.id];
+      if (video) links.append(link(video, '腾讯体育全场集锦', 'video'));
       entry.append(links);
       list.append(entry);
     }

@@ -10,6 +10,14 @@ const { cutoff, games, moves, highlights } = await readData('data.js', 'nbaArchi
 const fixtures = await readData('season-fixtures.js', 'nbaSeasonFixtures');
 const archiveIds = new Set(Object.values(games).flatMap(rows => rows.map(row => row.id)));
 const dayMs = 86_400_000;
+const newsByDay = new Map();
+const collected = JSON.parse(await readFile(new URL('news.json', archive), 'utf8'));
+for (const story of collected) {
+  const local = new Date(Date.parse(story.published) + dayMs / 3).toISOString();
+  const date = local.slice(0, 10);
+  if (!newsByDay.has(date)) newsByDay.set(date, []);
+  newsByDay.get(date).push({ ...story, time: local.slice(11, 16) });
+}
 const firstDay = Date.parse('2026-10-01');
 const lastDay = Date.parse('2027-06-30');
 
@@ -42,25 +50,40 @@ function makeBrief(date) {
   const results = rows.filter(game => game.status === '完赛');
   const upcoming = rows.filter(game => game.status === '未开赛');
   const other = rows.length - results.length - upcoming.length;
-  const teamNews = (moves[date] ?? []).slice(0, 8).map(([title, detail, url]) => ({ title, detail, url, label: '球队官宣' }));
+  const collectedNews = (newsByDay.get(date) ?? [])
+    .sort((a, b) => Number(Boolean(b.editorial)) - Number(Boolean(a.editorial)) || Date.parse(b.published) - Date.parse(a.published));
+  const newsItems = [];
+  const covered = new Set();
+  for (const story of collectedNews) {
+    if (story.gameId && covered.has(story.gameId)) continue;
+    if (story.gameId) covered.add(story.gameId);
+    newsItems.push({ title: story.title, detail: story.detail, url: story.url, label: story.label,
+      source: story.source, time: story.time, videoId: story.gameId });
+    if (newsItems.length === 5) break;
+  }
+  newsItems.sort((a, b) => b.time.localeCompare(a.time));
+  const teamNews = (moves[date] ?? []).slice(0, 8 - newsItems.length).map(([title, detail, url]) => ({ title, detail, url, label: '球队官宣' }));
+  const headlineItems = [...newsItems, ...teamNews];
   const totals = [];
+  if (newsItems.length) totals.push(newsItems.length + ' 条 NBA 资讯');
   if (results.length) totals.push(results.length + ' 场完赛');
   if (upcoming.length) totals.push(upcoming.length + ' 场待赛');
   if (other) totals.push(other + ' 场状态见赛程');
   if (moves[date]?.length) totals.push(moves[date].length + ' 条球队官宣');
   const summary = totals.length ? '当日已核对：' + totals.join('、') + '。' : '';
   if (!results.length) {
-    const entries = upcoming.slice(0, Math.min(3, 8 - teamNews.length)).map(game => ({
+    const entries = upcoming.slice(0, Math.min(3, 8 - headlineItems.length)).map(game => ({
       id: game.id, time: game.time, label: game.type + ' · 待赛',
       title: game.away + ' 对 ' + game.home, detail: ''
     }));
-    return { summary, entries: [...entries, ...teamNews] };
+    return { summary, entries: [...headlineItems, ...entries] };
   }
-  const standout = [...results].sort((a, b) => (highScorer(b)?.[1] ?? 0) - (highScorer(a)?.[1] ?? 0))[0];
-  const tightest = [...results].sort((a, b) => margin(a) - margin(b))[0];
-  const selection = [...new Set([tightest, standout, ...results])].slice(0, 8 - teamNews.length);
+  const remaining = results.filter(game => !covered.has(game.id));
+  const standout = [...remaining].sort((a, b) => (highScorer(b)?.[1] ?? 0) - (highScorer(a)?.[1] ?? 0))[0];
+  const tightest = [...remaining].sort((a, b) => margin(a) - margin(b))[0];
+  const selection = [...new Set([tightest, standout, ...remaining].filter(Boolean))].slice(0, 8 - headlineItems.length);
   const entries = selection.sort((a, b) => a.time.localeCompare(b.time)).map(recap);
-  return { summary, entries: [...entries, ...teamNews] };
+  return { summary, entries: [...headlineItems, ...entries] };
 }
 
 const published = new Date().toISOString();
@@ -79,11 +102,11 @@ function escapeHtml(value) {
 }
 
 function renderStory(story) {
-  const type = story.id ? 'game' : 'move';
+  const type = story.id ? 'game' : 'news';
   const matchLink = story.id ? 'https://www.nba.com/game/' + story.id : story.url;
-  const sourceLabel = story.id ? 'NBA 比赛中心' : '球队官方公告';
-  const official = '<a href="' + escapeHtml(matchLink) + '">' + sourceLabel + '</a>';
-  const video = highlights[story.id];
+  const sourceLabel = story.id ? 'NBA 比赛中心' : (story.source ?? '球队官方公告');
+  const official = '<a href="' + escapeHtml(matchLink) + '">' + escapeHtml(sourceLabel) + '</a>';
+  const video = highlights[story.videoId ?? story.id];
   const videoLink = video ? '<a class="video-link" href="' + escapeHtml(video) + '">腾讯体育全场集锦</a>' : '';
   const time = story.time ? '<time datetime="' + cutoff + 'T' + escapeHtml(story.time) + ':00+08:00">' + escapeHtml(story.time) + '</time>' : '';
   const detail = story.detail ? '<p>' + escapeHtml(story.detail) + '</p>' : '';
@@ -112,7 +135,7 @@ function renderLatestBrief(brief) {
     lines.push('    <div class="filters" role="group" aria-label="筛选简报" hidden>',
       '      <button type="button" data-filter="all" aria-pressed="true">全部</button>',
       '      <button type="button" data-filter="game" aria-pressed="false">比赛</button>',
-      '      <button type="button" data-filter="move" aria-pressed="false">球队官宣</button>',
+      '      <button type="button" data-filter="news" aria-pressed="false">NBA 资讯</button>',
       '    </div>');
   }
   if (brief.entries.length) lines.push('    <div class="grid">', ...brief.entries.map(renderStory), '    </div>');
