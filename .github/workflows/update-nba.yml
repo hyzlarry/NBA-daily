@@ -11,6 +11,7 @@ on:
         default: false
   schedule:
     - cron: '15 4,8 * * *'
+    - cron: '0 6 * * *' # 14:00 Beijing time
 
 concurrency:
   group: nba-daily-pages
@@ -26,7 +27,6 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
-        if: github.event_name != 'push'
         with:
           node-version: '24'
       - name: Validate official schedule without writing
@@ -35,6 +35,9 @@ jobs:
       - name: Refresh official scores and schedule
         if: github.event_name != 'push' && inputs.dry_run != true
         run: node scripts/update-nba.mjs
+      - name: Generate daily NBA briefings
+        if: inputs.dry_run != true
+        run: node scripts/build-briefings.mjs
       - name: Configure Pages
         if: inputs.dry_run != true
         uses: actions/configure-pages@v5
@@ -52,6 +55,8 @@ jobs:
         run: |
           mkdir _site
           cp -r index.html archive _site/
+          brief_version=$(sha256sum archive/daily/briefings.js | cut -c1-12)
+          sed -i "s/briefings\.js?v=[^\"]*/briefings.js?v=$brief_version/" _site/archive/daily/index.html
           data_version=$(sha256sum archive/daily/data.js | cut -c1-12)
           sed -i "s/data\.js?v=[^\"]*/data.js?v=$data_version/" _site/index.html _site/archive/daily/index.html
       - name: Upload site

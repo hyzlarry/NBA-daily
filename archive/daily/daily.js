@@ -143,6 +143,50 @@ function gameCard(game) {
   return card;
 }
 
+function renderDailyBrief(date, fixtures, dayEvents, stage) {
+  const section = el('section', '', 'detail briefing');
+  section.id = 'daily-brief';
+  section.setAttribute('aria-labelledby', 'daily-brief-title');
+  const title = el('h2', '每日简报');
+  title.id = 'daily-brief-title';
+  section.append(title);
+
+  const brief = nbaDailyBriefings.days[date];
+  let summary = brief.summary;
+  if (!summary && dayEvents.length) summary = '本日有 NBA 全明星周末活动，开场时间见下方赛程。';
+  if (!summary && stage) summary = stage[0];
+  if (!summary && date > cutoff) summary = '截至本次更新，联盟暂无该日的已公布比赛。';
+  if (!summary) summary = 'NBA 官方赛程显示当天没有比赛。';
+  section.append(el('p', summary, 'briefing-summary'));
+
+  if (brief.entries.length) {
+    const list = el('ul', '', 'briefing-list');
+    for (const story of brief.entries) {
+      const entry = el('li', '', 'briefing-item');
+      const meta = story.time ? story.time + ' · ' + story.label : story.label;
+      entry.append(el('p', meta, 'meta'), el('h3', story.title));
+      if (story.detail) entry.append(el('p', story.detail));
+      const links = el('div', '', 'links');
+      if (story.url) links.append(link(story.url, '球队官方公告'));
+      if (story.id) {
+        links.append(link('https://www.nba.com/game/' + story.id, 'NBA 比赛中心'));
+        const video = highlights[story.id];
+        if (video) links.append(link(video, '腾讯体育全场集锦', 'video'));
+      }
+      entry.append(links);
+      list.append(entry);
+    }
+    section.append(list);
+  }
+  if (date === '2026-11-22') {
+    section.append(link('../2026-11-22/index.html', '阅读 11 月 22 日编辑简报', 'briefing-more'));
+  }
+  if (dayEvents.length) section.append(link(allStarUrl, 'NBA 全明星官方赛程', 'briefing-more'));
+  if (stage && !fixtures.length) section.append(link(stage[1], 'NBA 官方阶段安排', 'briefing-more'));
+  section.append(link('#day-sources', '查看当日来源', 'briefing-more'));
+  return section;
+}
+
 function showDay(date) {
   document.title = `${dateLabel(date)} NBA 资讯｜终场哨`;
   const index = dates.indexOf(date);
@@ -158,9 +202,7 @@ function showDay(date) {
   nav.append(link(`./index.html#${date.slice(0, 7)}`, '返回日历'));
   if (index < dates.length - 1) nav.append(link(dateUrl(dates[index + 1]), '后一天'));
   main.append(nav);
-  if (date === '2026-11-22') {
-    main.append(link('../2026-11-22/index.html', '阅读 11 月 22 日每日简报'));
-  }
+  main.append(renderDailyBrief(date, fixtures, dayEvents, stage));
 
   const scores = el('section', '', 'detail');
   scores.append(el('h2', scheduled ? '待开赛' : '比赛'));
@@ -198,6 +240,7 @@ function showDay(date) {
     main.append(news);
   }
   const source = el('div', '', 'links detail');
+  source.id = 'day-sources';
   const previousDate = new Date(Date.parse(date) - dayLength).toISOString().slice(0, 10);
   source.append(
     link(`https://www.nba.com/games?date=${previousDate}`, 'NBA 官方赛程 · 北美前一日'),
@@ -213,6 +256,7 @@ function showDay(date) {
 const requested = new URLSearchParams(location.search).get('date');
 if (dates.includes(requested)) {
   showDay(requested);
+  document.getElementById(location.hash.slice(1))?.scrollIntoView();
 } else {
   showCalendar();
 }

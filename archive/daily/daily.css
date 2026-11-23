@@ -46,3 +46,12 @@ footer { border-top: 1px solid var(--line); border-bottom: 0; padding: .8rem 0; 
   .calendars, .games { grid-template-columns: 1fr; }
   main { padding-top: 1.4rem; }
 }
+
+
+.briefing { padding: clamp(1rem, 3vw, 1.6rem); border: 1px solid var(--line); background: var(--panel); scroll-margin-top: 1rem; }
+.briefing-summary { color: var(--muted); }
+.briefing-list { list-style: none; margin: .9rem 0 0; padding: 0; }
+.briefing-item { padding: .7rem 0 .55rem; border-top: 1px solid var(--line); }
+.briefing-item h3 { margin: .15rem 0; font-size: 1.08rem; }
+.briefing-item p { overflow-wrap: anywhere; }
+.briefing-more { display: inline-flex; align-items: center; min-height: 2.5rem; margin: .25rem .85rem 0 0; font-size: .85rem; }
