@@ -1,9 +1,18 @@
 [
   {
+    "published": "2026-11-23T09:00:00Z",
+    "url": "https://ak-static.cms.nba.com/referee/injury/Injury-Report_2026-11-23_04_00AM.pdf",
+    "title": "联盟更新伤病名单，里夫斯缺阵、文班亚马出战成疑",
+    "detail": "北京时间 11 月 24 日，湖人对爵士一战，里夫斯因左脚跟挫伤／骨挫伤被列为缺阵。马刺对国王一战，文班亚马因下背部紧绷、福克斯因右胫部挫伤均被列为出战成疑。状态以赛前更新为准。",
+    "label": "联盟伤病报告",
+    "source": "NBA 官方伤病报告",
+    "editorial": true
+  },
+  {
     "published": "2026-11-23T06:29:49Z",
     "url": "https://www.nba.com/news/nuggets-murray-jokic-make-history-in-win-over-bulls",
     "title": "穆雷 45 分、约基奇三双，掘金加时胜公牛",
-    "detail": "掘金以 151 比 145 获胜。穆雷与约基奇第 8 次在同一场比赛分别拿到 40 分以上和三双，创 NBA 队友组合纪录。",
+    "detail": "掘金加时以 151 比 145 取胜。穆雷得到 45 分，约基奇拿下 37 分、18 篮板、11 助攻，达成生涯第 202 次三双。这是两人第 8 次同场分别完成 40 分以上和三双。",
     "label": "赛场纪实",
     "source": "NBA.com",
     "gameId": "0022600283",
@@ -39,7 +48,7 @@
     "published": "2026-11-22T23:11:58Z",
     "url": "https://www.nba.com/news/okcs-shai-gilgeous-alexander-miamis-giannis-antetokounmpo-both-out-of-thunder-heat-matchup",
     "title": "亚历山大和字母哥均因伤缺席雷霆对热火",
-    "detail": "亚历山大颈部拉伤并伴有下背部挫伤，阿德托昆博右腹股沟拉伤。两人均为本赛季首次缺阵，热火最终以 123 比 113 取胜。",
+    "detail": "亚历山大因颈部拉伤和下背部挫伤缺席，阿德托昆博因右腹股沟拉伤缺席。两人均为本赛季首次缺阵，热火以 123 比 113 取胜并拿到七连胜。",
     "label": "伤病动态",
     "source": "NBA.com／美联社",
     "gameId": "0022600281",
@@ -49,7 +58,7 @@
     "published": "2026-11-22T22:12:59Z",
     "url": "https://www.nba.com/news/norman-powell-sidelined-with-hamstring-strain",
     "title": "公牛后卫鲍威尔右腿腿筋拉伤",
-    "detail": "鲍威尔在对奇才一战受伤，随后缺席对掘金的比赛。球队表示将于本周晚些时候复查。",
+    "detail": "鲍威尔在对奇才一战遭遇轻度右腿腿筋拉伤，随后缺席与掘金的比赛。公牛表示将在本周晚些时候复查。",
     "label": "伤病动态",
     "source": "NBA.com／美联社",
     "editorial": true
