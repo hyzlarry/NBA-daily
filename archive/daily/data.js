@@ -1,5 +1,5 @@
 const nbaArchiveData = {
-  cutoff: "2026-11-26",
+  cutoff: "2026-11-27",
   games: {
     "2026-10-01": [],
     "2026-10-02": [],
